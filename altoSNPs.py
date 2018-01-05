@@ -47,6 +47,7 @@ also .r file for analysis
 '''
 Each individual has two lines IndName_1 and IndName_2.
 There is a separate file with the name of each SNP on a separate line.
+There is a separate file with the name of each individual on a separate line.
 '''
 
 '''
@@ -569,6 +570,7 @@ elif OutFormat == "fasta":
 	SNPListOut = [ ]
 	OutFileName = OutFolder+OutFilePre+"SNPs.fa"
 	OutFileNameList = OutFolder+OutFilePre+"SNP_list.txt"
+	IndFileNameOut = OutFolder+OutFilePre+"allIndList.txt"
 	#making the body of the main output file
 	for OTU in OTUList:
 		for Num in range(MaxSNPs):
@@ -580,12 +582,34 @@ elif OutFormat == "fasta":
 				Line += SNP
 			Line += "\n"
 			SNPListOut.append(Line)
+	#writing the SNP names to a file
 	OutFile = open(OutFileNameList, 'w')
 	for KeyName in KeyList:
 		OutFile.write(KeyName+"\n")
 	OutFile.close()
 	print("The list of SNP names was written to the file %s.\n" % (OutFileNameList))
 	sys.stderr.write("The list of SNP names was written to the file %s.\n" % (OutFileNameList))
+	#writing the individual names to a file
+	OutFile = open(IndFileNameOut, 'w')
+	for OTU in OTUList:
+		OutFile.write(OTU+"\n")
+	OutFile.close()
+	print("The list of individuals was written to the file %s.\n" % (IndFileNameOut))
+	sys.stderr.write("The list of individuals was written to the file %s.\n" % (IndFileNameOut))
+	#writing separate files for each taxon
+	TaxIndDict = defaultdict(list)
+	for OTU in OTUList:
+		TaxName = OTU[:2]
+		TaxIndDict[TaxName].append(OTU)
+	for TaxName in TaxIndDict:
+		TaxOutFileName = OutFolder+OutFilePre+TaxName+"_inds.txt"
+		OutFile = open(TaxOutFileName, "w")
+		for OTU in TaxIndDict[TaxName]:
+			OutFile.write(OTU+"\n")
+		OutFile.close()
+	print("Separate lists of individuals for the %d taxa were written to files with names such as %s.\n" % (len(TaxIndDict.keys()), TaxOutFileName))
+	sys.stderr.write("Separate lists of individuals for the %d taxa were written to files with names such as %s.\n" % (len(TaxIndDict.keys()), TaxOutFileName))
+
 
 
 #writing the main output file (regardless of format)
